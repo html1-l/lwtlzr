@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网络安全技术网站</title>
+    
+    <!-- 使用 Tailwind CSS 通过 CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- 图标库 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css">
+    
+    
+    <!-- 添加动画库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    
+    <!-- 自定义样式 -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- 添加 Font Awesome 图标支持 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
+    <style>
+        body {
+            background-image: url('personal-photo.2.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+        
+        /* 为了确保内��性，可以添加半透明遮罩 */
+        .container {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        
+        /* 导航栏样式调整 */
+        nav {
+            background-color: rgba(255, 255, 255, 0.95) !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- 添加烟花背景画布 -->
+    <canvas id="fireworks" class="fireworks-canvas"></canvas>
+    
+    <!-- 导航栏 -->
+    <nav class="bg-white shadow-lg p-4">
+        <div class="container mx-auto">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                    <div class="logo-container">
+                        <img src="logo.png" alt="Logo" class="site-logo">
+                    </div>
+                    <h1 class="text-2xl font-bold text-blue-800">网络安全技术</h1>
+                </div>
+                <div class="nav-links">
+                    <a href="#" class="nav-link" data-page="home">首页</a>
+                    <a href="#" class="nav-link" data-page="courses">课程内容</a>
+                    <a href="#" class="nav-link" data-page="chat">在线交流</a>
+                    <a href="#" class="nav-link" data-page="resources">试题库</a>
+                    <a href="videos.html" class="nav-link" onclick="window.location.href='videos.html'; return false;">视频资源</a>
+                    <button id="loginBtn" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mr-2">登录</button>
+                    <button id="registerBtn" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">注册</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 登录模态框 -->
+    <div id="loginModal" class="modal hidden">
+        <div class="modal-content bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-xl font-bold mb-4">用户登录</h2>
+            <form id="loginForm">
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">用户名</label>
+                    <input type="text" id="username" class="w-full p-2 border rounded">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">密码</label>
+                    <input type="password" id="password" class="w-full p-2 border rounded">
+                </div>
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded w-full">登录</button>
+            </form>
+            <button class="modal-close absolute top-4 right-4">&times;</button>
+        </div>
+    </div>
+
+    <!-- 注册模态框 -->
+    <div id="registerModal" class="modal hidden">
+        <div class="modal-content bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-xl font-bold mb-4">用户注册</h2>
+            <form id="registerForm">
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">用户名</label>
+                    <input type="text" id="reg-username" class="w-full p-2 border rounded" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">邮箱</label>
+                    <input type="email" id="reg-email" class="w-full p-2 border rounded" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">密码</label>
+                    <input type="password" id="reg-password" class="w-full p-2 border rounded" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">认密码</label>
+                    <input type="password" id="reg-confirm-password" class="w-full p-2 border rounded" required>
+                </div>
+                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded w-full hover:bg-green-600">注册</button>
+            </form>
+            <button class="modal-close absolute top-4 right-4">&times;</button>
+        </div>
+    </div>
+
+    <!-- 主要内容区域 -->
+    <main id="app" class="container mx-auto mt-8 p-4">
+        <div id="resources" class="page-content">
+            <h2 class="text-2xl font-bold mb-6"></h2>
+           
+        </div>
+        <div id="chat" class="page-content hidden">
+            <div class="chat-container">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold">在线交流</h2>
+                    <!-- 仅管理员可见的发帖按钮 -->
+                    <button id="newPostBtn" class="admin-only hidden bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                        发布新帖子
+                    </button>
+                </div>
+
+                <!-- 帖子列表 -->
+                <div id="postsList" class="space-y-4">
+                    <!-- 帖子将通过 JavaScript 动态加载 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 添加发帖模态框（仅管理员可见） -->
+        <div id="newPostModal" class="modal hidden">
+            <div class="modal-content bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-bold mb-4">发布新帖子</h3>
+                <form id="newPostForm">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 mb-2">标题</label>
+                        <input type="text" id="postTitle" class="w-full p-2 border rounded" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 mb-2">内容</label>
+                        <textarea id="postContent" class="w-full p-2 border rounded h-32" required></textarea>
+                    </div>
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded w-full">发布</button>
+                </form>
+                <button class="modal-close absolute top-4 right-4">&times;</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页面路由和功能的JavaScript -->
+    <script src="app.js"></script>
+    <script src="fireworks.js"></script>
+    <script src="background-slider.js"></script>
+    <script>
+        // 初始化背景轮播
+        new BackgroundSlider();
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取所有导航链接
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            // 为导航链接添加点击事件
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const page = this.dataset.page;
+                    // 隐藏所有页面内容
+                    document.querySelectorAll('.page-content').forEach(content => {
+                        content.classList.add('hidden');
+                    });
+                    // 显示选中的页面内容
+                    const selectedPage = document.getElementById(page);
+                    if (selectedPage) {
+                        selectedPage.classList.remove('hidden');
+                    }
+                });
+            });
+
+            // 显示答案按钮的事件处理
+            document.querySelectorAll('.show-answer-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const answerDiv = this.nextElementSibling;
+                    if (answerDiv) {
+                        answerDiv.classList.toggle('hidden');
+                        this.textContent = answerDiv.classList.contains('hidden') ? '显示答案' : '隐藏答案';
+                    }
+                });
+            });
+
+            // 处理试题提交
+            const quizForm = document.getElementById('quizForm');
+            const resetBtn = document.getElementById('resetBtn');
+            const scoreDisplay = document.getElementById('score-display');
+            
+            if (quizForm) {
+                quizForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    // 显示所有答案和解析
+                    document.querySelectorAll('.answer').forEach(answer => {
+                        answer.classList.remove('hidden');
+                    });
+                    
+                    // 检查答案并标记结果
+                    document.querySelectorAll('.question-card').forEach(card => {
+                        const selectedAnswer = card.querySelector('input[type="radio"]:checked');
+                        if (selectedAnswer) {
+                            const correctAnswer = card.querySelector('.text-green-600').textContent.split('：')[1];
+                            
+                            // 添加视觉反馈
+                            if (selectedAnswer.value === correctAnswer) {
+                                card.classList.add('border-green-500', 'border-2');
+                            } else {
+                                card.classList.add('border-red-500', 'border-2');
+                            }
+                        } else {
+                            // 未作答的题目
+                            card.classList.add('border-yellow-500', 'border-2');
+                        }
+                    });
+                    
+                    // 禁用所有单选按钮
+                    document.querySelectorAll('input[type="radio"]').forEach(radio => {
+                        radio.disabled = true;
+                    });
+                    
+                    // 修改提交按钮文本
+                    const submitButton = quizForm.querySelector('button[type="submit"]');
+                    submitButton.textContent = '已提交';
+                    submitButton.disabled = true;
+                });
+                
+                // 重置按钮事件处理
+                resetBtn.addEventListener('click', function() {
+                    // 重置表单
+                    quizForm.reset();
+                    
+                    // 隐藏所有答案
+                    document.querySelectorAll('.answer').forEach(answer => {
+                        answer.classList.add('hidden');
+                    });
+                    
+                    // 隐藏分数显示
+                    scoreDisplay.classList.add('hidden');
+                    
+                    // 移除所有边框标记
+                    document.querySelectorAll('.question-card').forEach(card => {
+                        card.classList.remove('border-green-500', 'border-red-500', 'border-yellow-500', 'border-2');
+                    });
+                    
+                    // 启用所有单选按钮
+                    document.querySelectorAll('input[type="radio"]').forEach(radio => {
+                        radio.disabled = false;
+                    });
+                    
+                    // 隐藏重新作答按钮
+                    resetBtn.classList.add('hidden');
+                });
+            }
+
+            // 为每个题目的提交按钮添加点击事件
+            document.querySelectorAll('.question-card').forEach(card => {
+                const submitBtn = card.querySelector('.submit-answer');
+                const answerSection = card.querySelector('.answer');
+                
+                submitBtn.addEventListener('click', function() {
+                    // 检查是否已选择答案
+                    const selectedAnswer = card.querySelector('input[type="radio"]:checked');
+                    if (!selectedAnswer) {
+                        alert('请先选择一个答案');
+                        return;
+                    }
+                    
+                    // 显示答案和解析
+                    answerSection.classList.remove('hidden');
+                    
+                    // 检查答案是否正确
+                    const correctAnswer = answerSection.querySelector('.text-green-600').textContent.split('：')[1];
+                    if (selectedAnswer.value === correctAnswer) {
+                        card.classList.add('border-green-500', 'border-2');
+                    } else {
+                        card.classList.add('border-red-500', 'border-2');
+                    }
+                    
+                    // 禁用该题目的所有选项和提交按钮
+                    card.querySelectorAll('input[type="radio"]').forEach(radio => {
+                        radio.disabled = true;
+                    });
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = '已提交';
+                    submitBtn.classList.add('bg-gray-500');
+                    submitBtn.classList.remove('hover:bg-blue-600');
+                });
+            });
+
+            // 获取注册按钮和模态框
+            const registerBtn = document.getElementById('registerBtn');
+            const registerModal = document.getElementById('registerModal');
+            
+            // 注册按钮点击事件
+            registerBtn.addEventListener('click', function() {
+                registerModal.classList.remove('hidden');
+            });
+            
+            // 关闭注册模态框
+            registerModal.querySelector('.modal-close').addEventListener('click', function() {
+                registerModal.classList.add('hidden');
+            });
+            
+            // 处理注册表单提交
+            const registerForm = document.getElementById('registerForm');
+            registerForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const username = document.getElementById('reg-username').value;
+                const email = document.getElementById('reg-email').value;
+                const password = document.getElementById('reg-password').value;
+                const confirmPassword = document.getElementById('reg-confirm-password').value;
+                
+                // 验证密码是否匹配
+                if (password !== confirmPassword) {
+                    alert('两次输入的密码不一致！');
+                    return;
+                }
+                
+                // 这里可以添加注册逻辑
+                alert('注册成功！');
+                registerModal.classList.add('hidden');
+                registerForm.reset();
+            });
+
+            // 用户角色判断（示例）
+            let isAdmin = false;
+            let currentUser = null;
+
+            // 登录成功后设置用户角色
+            function handleLogin(userData) {
+                currentUser = userData;
+                isAdmin = userData.role === 'admin';
+                updateUIBasedOnRole();
+            }
+
+            // 根据用户角色更新界面
+            function updateUIBasedOnRole() {
+                const adminElements = document.querySelectorAll('.admin-only');
+                adminElements.forEach(element => {
+                    element.classList.toggle('hidden', !isAdmin);
+                });
+            }
+
+            // 帖子模板
+            function createPostElement(post) {
+                const postElement = document.createElement('div');
+                postElement.className = 'bg-white p-4 rounded-lg shadow mb-4';
+                postElement.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div class="flex-grow">
+                            <h3 class="text-xl font-bold">${post.title}</h3>
+                            <p class="text-gray-600 mt-2">${post.content}</p>
+                            <div class="mt-4 flex items-center space-x-4">
+                                <button class="like-btn flex items-center space-x-2 ${post.liked ? 'text-blue-500' : ''}" 
+                                        data-post-id="${post.id}">
+                                    <i class="far fa-thumbs-up"></i>
+                                    <span class="like-count">${post.likes}</span>
+                                </button>
+                                <span class="text-gray-500">发布于：${post.date}</span>
+                                <span class="text-gray-500">作者：${post.author}</span>
+                            </div>
+                        </div>
+                        ${isAdmin ? `
+                            <button class="delete-post-btn text-red-500 hover:text-red-700" data-post-id="${post.id}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        ` : ''}
+                    </div>
+                `;
+
+                // 添加点赞功能
+                const likeBtn = postElement.querySelector('.like-btn');
+                likeBtn.addEventListener('click', function() {
+                    if (!currentUser) {
+                        alert('请先登录后再点赞！');
+                        return;
+                    }
+                    const postId = this.dataset.postId;
+                    const likeCount = this.querySelector('.like-count');
+                    const currentLikes = parseInt(likeCount.textContent);
+                    
+                    // 切换点赞状态
+                    this.classList.toggle('text-blue-500');
+                    likeCount.textContent = this.classList.contains('text-blue-500') ? 
+                        currentLikes + 1 : currentLikes - 1;
+                    
+                    // ��里可以添加向后端发送点赞请求的代码
+                });
+
+                // 为管理员添加删除功能
+                if (isAdmin) {
+                    const deleteBtn = postElement.querySelector('.delete-post-btn');
+                    deleteBtn.addEventListener('click', function() {
+                        const postId = this.dataset.postId;
+                        if (confirm('确定要删除这个帖子吗？')) {
+                            postElement.remove();
+                            // 这里可以添加向后端发送删除请求的代码
+                        }
+                    });
+                }
+
+                return postElement;
+            }
+
+            // 加载帖子列表
+            function loadPosts() {
+                // 这里应该是从后端获取帖子数据
+                const samplePosts = [
+                    {
+                        id: 1,
+                        title: '网络安全最佳实践',
+                        content: '在当今数字时代，网络安全变得越来越重要。以下是一些基本的网络安全建议：1. 使用强密码 2. 开启双因素认证 3. 定期更新软件 4. 注意钓鱼邮件...',
+                        author: '管理员',
+                        likes: 15,
+                        date: '2024-03-20',
+                        liked: false
+                    },
+                    {
+                        id: 2,
+                        title: '密码学基础知识分享',
+                        content: '密码学是网络安全的基石。本文将介绍几个重要的密码学概念：对称加密、非对称加密、哈希函数等...',
+                        author: '安全专家',
+                        likes: 8,
+                        date: '2024-03-19',
+                        liked: false
+                    },
+                    {
+                        id: 3,
+                        title: '防火墙配置指南',
+                        content: '正确配置防火墙是保护网络安全的关键步骤。本文将详细介绍防火墙的基本配置方法...',
+                        author: '网络工程师',
+                        likes: 12,
+                        date: '2024-03-18',
+                        liked: false
+                    }
+                ];
+
+                const postsList = document.getElementById('postsList');
+                if (postsList) {
+                    postsList.innerHTML = '';
+                    samplePosts.forEach(post => {
+                        postsList.appendChild(createPostElement(post));
+                    });
+                }
+            }
+
+            // 处理新帖子发布
+            const newPostBtn = document.getElementById('newPostBtn');
+            const newPostModal = document.getElementById('newPostModal');
+            const newPostForm = document.getElementById('newPostForm');
+
+            if (newPostBtn) {
+                newPostBtn.addEventListener('click', () => {
+                    if (!currentUser) {
+                        alert('请先登录！');
+                        return;
+                    }
+                    newPostModal.classList.remove('hidden');
+                });
+            }
+
+            if (newPostForm) {
+                newPostForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const title = document.getElementById('postTitle').value;
+                    const content = document.getElementById('postContent').value;
+
+                    // 创建新帖子对象
+                    const newPost = {
+                        id: Date.now(),
+                        title,
+                        content,
+                        author: currentUser.username,
+                        likes: 0,
+                        date: new Date().toISOString().split('T')[0],
+                        liked: false
+                    };
+
+                    // 添加新帖子到列表
+                    const postsList = document.getElementById('postsList');
+                    postsList.insertBefore(createPostElement(newPost), postsList.firstChild);
+
+                    // 关闭模态框并重置表单
+                    newPostModal.classList.add('hidden');
+                    newPostForm.reset();
+                });
+            }
+
+            // 初始化加载帖子
+            loadPosts();
+
+            // 取消注释以下代码来测试管理员功能
+            handleLogin({
+                username: 'admin',
+                role: 'admin'
+            });
+        });
+    </script>
+</body>
+</html> 
